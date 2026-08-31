@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>멍BTI - 나와 닮은 강아지 찾기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF8EA; --mustard:#F3B93A; --mustard-dark:#D89B1E;
+    --teal:#1F4B43; --teal-light:#2E6B5E; --coral:#FF6F59;
+    --ink:#2A2620; --paper:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Pretendard',-apple-system,sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;display:flex;justify-content:center;}
+  .stage{width:100%;max-width:420px;min-height:100vh;background:var(--paper);position:relative;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,0.06);}
+  .screen{display:none;flex-direction:column;flex:1;padding:28px 24px 32px;}
+  .screen.active{display:flex;}
+  button{font-family:'Pretendard',sans-serif;border:none;cursor:pointer;}
+
+  /* Intro */
+  #intro{background:var(--teal);color:var(--cream);justify-content:space-between;padding-top:56px;}
+  .eyebrow{font-size:14px;color:var(--mustard);font-weight:600;margin-bottom:10px;}
+  #intro h1{font-family:'Fredoka',sans-serif;font-size:40px;line-height:1.15;margin:0 0 18px;color:var(--paper);}
+  #intro p{font-size:15.5px;line-height:1.6;color:#CFE0D8;margin:0;max-width:280px;}
+  .btn-primary{background:var(--mustard);color:var(--teal);font-weight:700;font-size:16px;padding:17px;border-radius:14px;width:100%;transition:transform .15s ease;}
+  .btn-primary:active{transform:scale(0.97);}
+
+  /* MBTI select */
+  #select{padding-top:40px;}
+  #select h2{font-size:22px;margin:0 0 6px;font-weight:600;}
+  #select .sub{font-size:14px;color:#8C8574;margin:0 0 28px;}
+  .mbti-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+  .mbti-btn{aspect-ratio:1;border-radius:14px;background:var(--cream);color:var(--teal);font-family:'Fredoka',sans-serif;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid transparent;}
+  .mbti-btn:active,.mbti-btn.picked{border-color:var(--coral);background:#FFF1EC;}
+  .select-footer{margin-top:auto;font-size:13px;color:#B7AE9C;text-align:center;}
+
+  /* Reveal */
+  #reveal{padding-top:24px;}
+  .reveal-label{text-align:center;font-size:13px;color:var(--mustard-dark);font-weight:600;letter-spacing:2px;margin-bottom:8px;}
+  .reveal-emoji{align-self:center;font-size:64px;margin-bottom:6px;text-align:center;}
+  .reveal-breed{text-align:center;font-family:'Fredoka',sans-serif;font-size:28px;color:var(--teal);margin:0 0 4px;}
+  .reveal-mbti{text-align:center;font-size:13.5px;color:#8C8574;margin:0 0 20px;}
+  .reveal-desc{text-align:center;font-size:15px;line-height:1.65;color:#5B5548;margin:0 0 26px;padding:0 2px;}
+  .trait-card{background:var(--cream);border-radius:16px;padding:20px;margin-bottom:16px;}
+  .trait-card h3{font-size:13.5px;color:var(--teal-light);margin:0 0 16px;font-weight:700;}
+  .trait-row{margin-bottom:14px;}
+  .trait-row:last-child{margin-bottom:0;}
+  .trait-labels{display:flex;justify-content:space-between;font-size:12.5px;color:#8C8574;margin-bottom:6px;}
+  .trait-bar{height:8px;background:#EDE4CF;border-radius:99px;overflow:hidden;}
+  .trait-fill{height:100%;background:var(--coral);border-radius:99px;}
+  .cta-card{background:var(--teal);color:var(--cream);border-radius:16px;padding:20px;margin-bottom:20px;}
+  .cta-card p{margin:0 0 14px;font-size:14.5px;line-height:1.6;color:#DCEAE4;}
+  .btn-cta{background:var(--mustard);color:var(--teal);font-weight:700;font-size:15px;padding:15px;border-radius:12px;width:100%;}
+  .back-link{background:none;color:#B7AE9C;font-size:13.5px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- INTRO -->
+  <div class="screen active" id="intro">
+    <div>
+      <div class="eyebrow">MBTI × DOG MATCHING</div>
+      <h1>나와 닮은<br>강아지 찾기</h1>
+      <p>당신의 MBTI와 꼭 닮은 성격의 강아지 종을 찾아드려요. 그 강아지를 직접 키우는 것도 가능해요.</p>
+    </div>
+    <button class="btn-primary" onclick="show('select')">내 MBTI로 찾기</button>
+  </div>
+
+  <!-- MBTI SELECT -->
+  <div class="screen" id="select">
+    <h2>당신의 MBTI는?</h2>
+    <p class="sub">모르신다면 평소 성향에 가장 가까운 걸 골라주세요.</p>
+    <div class="mbti-grid" id="mbtiGrid"></div>
+    <button class="btn-primary" id="matchBtn" disabled onclick="reveal()">매칭 결과 보기</button>
+    <div class="select-footer">16개 유형 중 하나를 선택하세요</div>
+  </div>
+
+  <!-- REVEAL -->
+  <div class="screen" id="reveal">
+    <div class="reveal-label" id="revealMbtiTop">ENFP 매칭 결과</div>
+    <div class="reveal-emoji" id="revealEmoji">🐕</div>
+    <div class="reveal-breed" id="revealBreed">골든 리트리버</div>
+    <div class="reveal-mbti" id="revealMbti"></div>
+    <p class="reveal-desc" id="revealDesc"></p>
+
+    <div class="trait-card">
+      <h3>이 견종의 특성</h3>
+      <div id="traitRows"></div>
+    </div>
+
+    <div class="cta-card">
+      <p id="ctaText"></p>
+      <button class="btn-cta" onclick="alert('육성 게임 코어 루프는 다음 단계에서 이어집니다')">이 강아지 키우기 시작</button>
+    </div>
+
+    <button class="back-link" onclick="show('select')">다른 유형으로 다시 찾기</button>
+  </div>
+
+</div>
+
+<script>
+const MBTI_LIST = ['ENFP','ENFJ','ENTP','ENTJ','ESFP','ESFJ','ESTP','ESTJ',
+                    'INFP','INFJ','INTP','INTJ','ISFP','ISFJ','ISTJ','ISTP'];
+
+const BREED_MATCH = {
+  ENFP:{ breed:'골든 리트리버', emoji:'🐕‍🦺', desc:'낯선 사람도 금세 친구로 만드는 밝은 에너지. 당신처럼 사람과 새로운 경험을 좋아해요.',
+    traits:{에너지:75, 독립성:30, 애정도:90, 훈련성:80} },
+  ENFJ:{ breed:'래브라도 리트리버', emoji:'🦮', desc:'주변 사람을 잘 챙기고 온화한 성격. 당신처럼 무리를 편안하게 이끄는 타입이에요.',
+    traits:{에너지:80, 독립성:25, 애정도:85, 훈련성:90} },
+  ENTP:{ breed:'잭 러셀 테리어', emoji:'🐩', desc:'끊임없는 호기심과 장난기. 당신처럼 아이디어가 넘치고 가만히 있질 못해요.',
+    traits:{에너지:90, 독립성:60, 애정도:55, 훈련성:50} },
+  ENTJ:{ breed:'도베르만 핀셔', emoji:'🐕', desc:'카리스마 있고 목표지향적. 당신처럼 상황을 주도하는 리더 기질이 있어요.',
+    traits:{에너지:70, 독립성:55, 애정도:60, 훈련성:85} },
+  ESFP:{ breed:'비글', emoji:'🐶', desc:'즉흥적이고 사교적인 분위기 메이커. 당신처럼 그 순간을 마음껏 즐겨요.',
+    traits:{에너지:80, 독립성:50, 애정도:70, 훈련성:45} },
+  ESFJ:{ breed:'코카 스파니엘', emoji:'🐕', desc:'다정하고 배려심 많은 성격. 당신처럼 주변 사람을 세심하게 챙겨요.',
+    traits:{에너지:55, 독립성:20, 애정도:90, 훈련성:75} },
+  ESTP:{ breed:'달마시안', emoji:'🐆', desc:'대담하고 활동적인 행동파. 당신처럼 몸으로 부딪히며 배우는 걸 좋아해요.',
+    traits:{에너지:95, 독립성:60, 애정도:55, 훈련성:55} },
+  ESTJ:{ breed:'저먼 셰퍼드', emoji:'🐕‍🦺', desc:'책임감 있고 규율을 잘 따르는 성격. 당신처럼 체계적으로 일을 해내요.',
+    traits:{에너지:75, 독립성:45, 애정도:65, 훈련성:95} },
+  INFP:{ breed:'시바견', emoji:'🦊', desc:'겉은 무심해 보여도 속은 섬세한 타입. 당신처럼 자기만의 세계가 뚜렷해요.',
+    traits:{에너지:55, 독립성:85, 애정도:50, 훈련성:40} },
+  INFJ:{ breed:'보더 콜리', emoji:'🐕', desc:'관찰력이 뛰어나고 통찰력 있는 성격. 당신처럼 깊이 생각하고 신중하게 행동해요.',
+    traits:{에너지:85, 독립성:40, 애정도:65, 훈련성:95} },
+  INTP:{ breed:'차우차우', emoji:'🦁', desc:'독립적이고 자기 페이스를 지키는 타입. 당신처럼 남의 기준에 휘둘리지 않아요.',
+    traits:{에너지:35, 독립성:90, 애정도:40, 훈련성:35} },
+  INTJ:{ breed:'스탠다드 푸들', emoji:'🐩', desc:'똑똑하고 전략적인 문제 해결형. 당신처럼 효율적인 방법을 스스로 찾아내요.',
+    traits:{에너지:65, 독립성:60, 애정도:60, 훈련성:90} },
+  ISFP:{ breed:'프렌치 불도그', emoji:'🐶', desc:'느긋하고 감성적인 성격. 당신처럼 편안한 분위기 속에서 진가를 발휘해요.',
+    traits:{에너지:30, 독립성:40, 애정도:80, 훈련성:55} },
+  ISFJ:{ breed:'카발리에 킹 찰스 스패니얼', emoji:'🐕', desc:'다정하고 헌신적인 성격. 당신처럼 가까운 사람을 조용히 챙겨요.',
+    traits:{에너지:45, 독립성:15, 애정도:95, 훈련성:70} },
+  ISTJ:{ breed:'그레이트 피레니즈', emoji:'🐻', desc:'듬직하고 신뢰할 수 있는 성격. 당신처럼 맡은 일을 묵묵히 지켜내요.',
+    traits:{에너지:40, 독립성:60, 애정도:60, 훈련성:65} },
+  ISTP:{ breed:'휘핏', emoji:'🐕', desc:'평소엔 조용하지만 필요할 땐 확실하게 움직이는 타입. 당신처럼 군더더기가 없어요.',
+    traits:{에너지:60, 독립성:75, 애정도:45, 훈련성:50} },
+};
+
+let picked = null;
+
+(function initGrid(){
+  const grid = document.getElementById('mbtiGrid');
+  MBTI_LIST.forEach(code=>{
+    const btn = document.createElement('button');
+    btn.className = 'mbti-btn';
+    btn.textContent = code;
+    btn.onclick = ()=>{
+      document.querySelectorAll('.mbti-btn').forEach(b=>b.classList.remove('picked'));
+      btn.classList.add('picked');
+      picked = code;
+      document.getElementById('matchBtn').disabled = false;
+    };
+    grid.appendChild(btn);
+  });
+})();
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function reveal(){
+  if(!picked) return;
+  const m = BREED_MATCH[picked];
+  document.getElementById('revealMbtiTop').textContent = picked + ' 매칭 결과';
+  document.getElementById('revealEmoji').textContent = m.emoji;
+  document.getElementById('revealBreed').textContent = m.breed;
+  document.getElementById('revealMbti').textContent = picked + ' 유형과 매칭';
+  document.getElementById('revealDesc').textContent = m.desc;
+  document.getElementById('ctaText').textContent = `이제 ${m.breed}를 직접 키워보세요. 매일 밥을 주고 산책하며 성장 과정을 지켜볼 수 있어요.`;
+
+  const container = document.getElementById('traitRows');
+  container.innerHTML = '';
+  Object.entries(m.traits).forEach(([label, val])=>{
+    const row = document.createElement('div');
+    row.className = 'trait-row';
+    row.innerHTML = `
+      <div class="trait-labels"><span>${label}</span><span>${val}</span></div>
+      <div class="trait-bar"><div class="trait-fill" style="width:${val}%"></div></div>
+    `;
+    container.appendChild(row);
+  });
+
+  show('reveal');
+}
+</script>
+</body>
+</html>
